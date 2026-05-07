@@ -49,16 +49,16 @@ public class PrefsManager {
         return prefs.getInt(AppConstants.KEY_SESSIONS_COMPLETED, 0);
     }
 
-    public int getTotalFocusMin() {
-        return prefs.getInt(AppConstants.KEY_TOTAL_FOCUS_MIN, 0);
+    public long getTotalFocusMin() {
+        return prefs.getLong(AppConstants.KEY_TOTAL_FOCUS_MIN, 0L);
     }
 
-    public void trackCompletedSession(int focusMinutesCompleted) {
+    public void trackCompletedSession(long focusMinutesCompleted) {
         int sessions = getSessionsCompleted() + 1;
-        int total = getTotalFocusMin() + Math.max(focusMinutesCompleted, 0);
+        long total = getTotalFocusMin() + Math.max(focusMinutesCompleted, 0L);
         prefs.edit()
                 .putInt(AppConstants.KEY_SESSIONS_COMPLETED, sessions)
-                .putInt(AppConstants.KEY_TOTAL_FOCUS_MIN, total)
+                .putLong(AppConstants.KEY_TOTAL_FOCUS_MIN, total)
                 .apply();
     }
 }

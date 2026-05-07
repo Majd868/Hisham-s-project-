@@ -1,6 +1,7 @@
 package com.majd.pomodoro;
 
 import androidx.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FirebaseRepository {
+    private static final String TAG = "FirebaseRepository";
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
@@ -21,7 +23,10 @@ public class FirebaseRepository {
     public void signIn(String email, String password, OnSuccessListener<?> onSuccess, @NonNull Runnable onError) {
         auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(onSuccess)
-                .addOnFailureListener(e -> onError.run());
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "signIn failed", e);
+                    onError.run();
+                });
     }
 
     public void register(String name, String email, String password, OnSuccessListener<?> onSuccess, @NonNull Runnable onError) {
@@ -39,12 +44,18 @@ public class FirebaseRepository {
                     firestore.collection("users").document(user.getUid())
                             .set(profile)
                             .addOnSuccessListener(onSuccess)
-                            .addOnFailureListener(e -> onError.run());
+                            .addOnFailureListener(e -> {
+                                Log.w(TAG, "profile save failed", e);
+                                onError.run();
+                            });
                 })
-                .addOnFailureListener(e -> onError.run());
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "register failed", e);
+                    onError.run();
+                });
     }
 
-    public void saveStudyState(int focusMin, int breakMin, int blocks, int sessionsCompleted, int totalFocusMin, int reminderHour, int reminderMinute) {
+    public void saveStudyState(int focusMin, int breakMin, int blocks, int sessionsCompleted, long totalFocusMin, int reminderHour, int reminderMinute) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
             return;
@@ -56,7 +67,7 @@ public class FirebaseRepository {
         study.put("lastBlocks", blocks);
         study.put("sessionsCompleted", sessionsCompleted);
         study.put("totalFocusMin", totalFocusMin);
-        study.put("averageFocusMin", sessionsCompleted == 0 ? 0 : totalFocusMin / sessionsCompleted);
+        study.put("averageFocusMin", sessionsCompleted == 0 ? 0L : totalFocusMin / sessionsCompleted);
         study.put("reminderHour", reminderHour);
         study.put("reminderMinute", reminderMinute);
         study.put("updatedAt", System.currentTimeMillis());

@@ -122,7 +122,7 @@ public class HomeActivity extends AppCompatActivity {
     private void onSessionCompleted() {
         stopPomodoro();
         statusText.setText(R.string.status_completed);
-        int focusMinutes = engine.getFocusMin() * engine.getTotalBlocks();
+        long focusMinutes = (long) engine.getFocusMin() * engine.getTotalBlocks();
         prefsManager.trackCompletedSession(focusMinutes);
         repository.saveStudyState(
                 prefsManager.getFocusMin(),
